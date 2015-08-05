@@ -10,7 +10,6 @@ A python library to make maximum use of Sanskrit related tools available at http
 
 3. Libraries used - codecs, urllib2, datetime, time
 
-
 # Todo
 
 The library is still under development.

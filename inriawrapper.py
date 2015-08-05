@@ -1,12 +1,11 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
-import json
-import scrapy
 import codecs
 from bs4 import BeautifulSoup
 import urllib2
 import datetime
 import time
+import re
 
 def timestamp():
 	print datetime.datetime.now()
@@ -159,12 +158,44 @@ def v(text):
 def d(text):
 	input = text.split('.')
 	if input[1] in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']:
-		return v(text)
+		return v(text).strip()
 	elif input[1] in ['m', 'f', 'n', 'a']:
-		return s(text)
+		return s(text).strip()
 	else:
 		print "Error in format of word entered."
 		return "????"
 
-print d('BU.1.p.low.t.1.1')
-print d('Davala.q.1.3')
+# function dictconverter to parse document written in SanskritMark and render output.
+# This function converts a file of SanskritMark words into Devanagari output file. The input file must have only one word in each line.
+def dictconverter(inputfile,outputfile):
+	with open(inputfile) as f:
+		content = f.readlines()
+	out = []
+	for line in content:
+		line = line.strip()
+		out.append(d(line))
+	with codecs.open(outputfile, "w", "utf-8-sig") as temp:
+		for member in out:
+			temp.write(member.strip() + "\n")
+		temp.close()
+
+# function parser to parse document written in SanskritMark and render output.
+# The input should be stored in a file. words must be separated by space.
+def parser(inputfile,outputfile):
+	with open(inputfile) as f:
+		content = f.readlines()
+	out = []
+	g = codecs.open(outputfile, 'w', 'utf-8-sig')
+	for line in content:
+		line = line.strip()
+		words = re.split(r'( )', line)
+		print words
+		for x in xrange(len(words)):
+			if x%2 == 0:
+				g.write(d(words[x]))
+			else:
+				g.write(" ")
+		g.write("\n")
+	g.close()
+
+parser("input.txt", "output.txt")
