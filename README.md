@@ -14,7 +14,7 @@ The expected output of the project is-
 
 3. To derive a python functionality for declention of *kridanta* forms based on http://sanskrit.inria.fr/DICO/grammar.en.html
 
-4. To develop SanskritMark (a specification like markdown for writing Sanskrit stuff) which can be benifited by the present scripts.
+4. To develop [SanskritMark](https://github.com/drdhaval2785/inriawrapper/blob/master/SanskritMark.md) (a specification like markdown for writing Sanskrit stuff) which can be benifited by the present scripts.
 
 5. To derive a python functionality for dictionary lookup of a Sanskrit word based on http://www.sanskrit-lexicon.uni-koeln.de/ data.
 
