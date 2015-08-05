@@ -162,6 +162,9 @@ def d(text):
 		return v(text)
 	elif input[1] in ['m', 'f', 'n', 'a']:
 		return s(text)
+	else:
+		print "Error in format of word entered."
+		return "????"
 
 print d('BU.1.p.low.t.1.1')
-print d('Davala.m.1.3')
+print d('Davala.q.1.3')

@@ -2,6 +2,15 @@
 
 A python library to make maximum use of Sanskrit related tools available at http://sanskrit.inria.fr/
 
+# Requirements
+
+1. [python2.7](https://www.python.org/)
+
+2. [BeautifulSoup](http://www.crummy.com/software/BeautifulSoup/)
+
+3. Libraries used - codecs, urllib2, datetime, time
+
+
 # Todo
 
 The library is still under development.
