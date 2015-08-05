@@ -26,6 +26,9 @@ The expected output of the project is-
 
 9. Write a converter from html to SanskritMark and vice versa.
 
+10. To derive a python functionality for sandhi generation given in http://sanskrit.inria.fr/DICO/sandhi.en.html
+
+
 # Duration
 
 The project has just started. It would take quite some time to complete all the functionalities.
