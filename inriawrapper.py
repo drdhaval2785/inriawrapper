@@ -154,5 +154,14 @@ def v(text):
 	tinlist = ['1.1', '1.2', '1.3', '2.1', '2.2', '2.3', '3.1', '3.2', '3.3']
 	numlist = [5,6,7,9,10,11,13,14,15]
 	return tin[numlist[tinlist.index(tinnumber)]]
-	
-print v('BU.1.p.low.t.1.1')
+
+# function 'd' for declention. It decides the proper declention function to chose i.e. 's' or 'v'
+def d(text):
+	input = text.split('.')
+	if input[1] in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']:
+		return v(text)
+	elif input[1] in ['m', 'f', 'n', 'a']:
+		return s(text)
+
+print d('BU.1.p.low.t.1.1')
+print d('Davala.m.1.3')
