@@ -8,7 +8,7 @@ A python library to make maximum use of Sanskrit related tools available at http
 
 2. [BeautifulSoup](http://www.crummy.com/software/BeautifulSoup/)
 
-3. Libraries used - codecs, urllib2, datetime, time
+3. Libraries used - codecs, urllib2, datetime, time, re
 
 # Todo
 
