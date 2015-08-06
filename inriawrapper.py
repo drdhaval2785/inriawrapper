@@ -6,6 +6,7 @@ import urllib2
 import datetime
 import time
 import re
+import transcoder
 
 def timestamp():
 	print datetime.datetime.now()
@@ -200,4 +201,24 @@ def parser(inputfile,outputfile):
 		g.write("\n")
 	g.close()
 
-parser("input.txt", "output.txt")
+# function 'rv' for reverse verb identification.
+# It converts the devanagari verb form to SanskritMark for verbs
+def rv(text):
+	text = text.decode('utf-8')
+	text = transcoder.transcoder_processString(text,'deva','slp1')
+	url = 'http://sanskrit.inria.fr/cgi-bin/SKT/sktlemmatizer?lex=MW&q=' + text + '&t=SL&c=Verb'
+	response = urllib2.urlopen(url)
+	#print "webpage downloaded at ",
+	#timestamp()
+	html_doc = response.read()
+	soup = BeautifulSoup(html_doc, 'html.parser')
+	#print "soup made at ",
+	#timestamp()
+	interestingdiv = soup.find("div", { "class" : "center" })
+	table = interestingdiv.find("table", { "class" : "yellow_cent" })
+	span = table.tr.th.find("span", { "class" : "latin12" })
+	data = str(span).split('<br>\n')[1]
+	print data
+	
+	
+rv("कुर्वन्ति")
