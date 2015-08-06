@@ -188,12 +188,12 @@ def parser(inputfile,outputfile):
 	g = codecs.open(outputfile, 'w', 'utf-8-sig')
 	for line in content:
 		line = line.strip()
-		#words = re.split(r'( )', line)
-		line = re.sub('(\w)(. )','\1 \2', line)
-		words = re.split('( )', line)
+		words = re.split('([ ,?"!]+)', line)
 		print words
 		for x in xrange(len(words)):
-			if x%2 == 0:
+			if x%2 == 0 and words[x].endswith('.'):
+				g.write(d(words[x]) + ".")
+			elif x%2 == 0 and not words[x].endswith('.'):
 				g.write(d(words[x]))
 			else:
 				g.write(words[x])
