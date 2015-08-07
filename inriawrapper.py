@@ -201,8 +201,50 @@ def parser(inputfile,outputfile):
 		g.write("\n")
 	g.close()
 
+#function tosm to convert attributes in { } to SanskritMark specification
+# For active voice example - { pft. ac. pl. 2 | pft. ac. sg. 3 | pft. ac. sg. 1 } or { opt. [1] ac. sg. 3 }
+# For passive voice example - { pr. ps. sg. 3 | ca. pr. ps. sg. 3 }
+# Expected output is in format gana.pada.lakara.vacya.purusa.vacana in case there is only one possible output.
+# Right now Gerard machine only gives lakara.vacya.purusa.vacana information. And in some cases gana information.
+def tosm(attributes):
+	#attributes = "{ pft. ac. pl. 2 | pft. ac. sg. 3 | pft. ac. sg. 1 }"
+	mapping = [ ('per. fut.', 'per.fut.')]
+	lakaraslplist = ['law', 'laN', 'viliN', 'low', 'lfw', 'lfN', 'luw', 'liw', 'luN', 'aluN', 'AliN']
+	lakarasitelist = ['pr', 'impft', 'opt', 'imp', 'fut', 'cond', 'per.fut', 'pft', 'aor', 'inj', 'ben']
+	vacyaslplist = ['t', 'm']
+	vacyasitelist = ['ac', 'ps']
+	vacanaslplist = ['1', '2', '3']
+	vacanasitelist = ['sg', 'du', 'pl']
+	purusaslplist = ['p', 'm', 'u']
+	purusasitelist = ['3', '2', '1']
+	attributes = attributes.replace('{ ', '')
+	attributes = attributes.replace(' }', '')
+	possibles = attributes.split(' | ')
+	data = []
+	for member in possibles:
+		if '[' in member:
+			middle = re.split(' \[([0-9]+)\]', member)
+			gana = middle[1]
+			rest = middle[0] + middle[2]
+		else:
+			gana = ''
+			rest = member
+		for k, v in mapping:
+			rest = rest.replace(k, v)
+		pada = ''
+		attr = rest.split('. ')
+		lakara, vacya, vacana, purusa = attr[0], attr[1], attr[2], attr[3]
+		lakara = lakaraslplist[lakarasitelist.index(lakara)]
+		vacya = vacyaslplist[vacyasitelist.index(vacya)]
+		vacana = vacanaslplist[vacanasitelist.index(vacana)]
+		purusa = purusaslplist[purusasitelist.index(purusa)]
+		data.append(gana + '.' + pada + '.' + lakara + '.' + vacya + '.' + purusa + '.' +vacana)
+	return data
+
 # function 'rv' for reverse verb identification.
 # It converts the devanagari verb form to SanskritMark for verbs
+# For verbs, the expected output format is verb.gana.pada.lakara.vacya.purusa.vacana
+# If there are more than one parsing possible, the expected output is in verb.{gana.pada.lakara.vacya.purusa.vacana|gana2.pada2.lakara2.vacya2.purusa2.vacana2} etc format.
 def rv(text):
 	text = text.decode('utf-8')
 	text = transcoder.transcoder_processString(text,'deva','slp1')
@@ -218,7 +260,17 @@ def rv(text):
 	table = interestingdiv.find("table", { "class" : "yellow_cent" })
 	span = table.tr.th.find("span", { "class" : "latin12" })
 	data = str(span).split('<br>\n')[1]
-	print data
+	verbattr_separator = str(data).split('[')
+	attributes = verbattr_separator[0]
+	verbsoup = BeautifulSoup(verbattr_separator[1], 'html.parser')
+	verb = verbsoup.a.text
+	verb = re.sub("[0-9_]+", "", verb)
+	data = tosm(attributes)
+	if len(data) > 1:	
+		appendix = '{' + '|'.join(data) + '}'
+	else:
+		appendix = data[0]
+	print verb + '.' +appendix
+
 	
-	
-rv("कुर्वन्ति")
+rv("जगाम")
