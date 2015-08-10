@@ -204,6 +204,7 @@ def parser(inputfile,outputfile):
 #function tosm to convert attributes in { } to SanskritMark specification
 # For active voice example - { pft. ac. pl. 2 | pft. ac. sg. 3 | pft. ac. sg. 1 } or { opt. [1] ac. sg. 3 }
 # For passive voice example - { pr. ps. sg. 3 | ca. pr. ps. sg. 3 }
+# For subanta example - { g. sg. f. | abl. sg. f. }
 # Expected output is in format gana.pada.lakara.vacya.purusa.vacana in case there is only one possible output.
 # Right now Gerard machine only gives lakara.vacya.purusa.vacana information. And in some cases gana information.
 def tosm(attributes):
@@ -217,9 +218,14 @@ def tosm(attributes):
 	vacanasitelist = ['sg', 'du', 'pl']
 	purusaslplist = ['p', 'm', 'u']
 	purusasitelist = ['3', '2', '1']
+	caseslplist = ['1', '2', '3', '4', '5', '6', '7', '0', ]
+	casesitelist = ['nom', 'acc', 'i', 'dat', 'abl', 'g', 'loc', 'sam', ] # sam absent in Gerard's site.
+	genderslplist = ['m', 'f', 'n', 'a']
+	gendersitelist = ['m.', 'f.', 'n.', '*']
 	attributes = attributes.replace('{ ', '')
 	attributes = attributes.replace(' }', '')
 	possibles = attributes.split(' | ')
+	print possibles
 	data = []
 	for member in possibles:
 		if '[' in member:
@@ -233,18 +239,26 @@ def tosm(attributes):
 			rest = rest.replace(k, v)
 		pada = ''
 		attr = rest.split('. ')
-		lakara, vacya, vacana, purusa = attr[0], attr[1], attr[2], attr[3]
-		lakara = lakaraslplist[lakarasitelist.index(lakara)]
-		vacya = vacyaslplist[vacyasitelist.index(vacya)]
-		vacana = vacanaslplist[vacanasitelist.index(vacana)]
-		purusa = purusaslplist[purusasitelist.index(purusa)]
-		data.append(gana + '.' + pada + '.' + lakara + '.' + vacya + '.' + purusa + '.' +vacana)
+		if len(attr) == 4:			
+			lakara, vacya, vacana, purusa = attr[0], attr[1], attr[2], attr[3]
+			lakara = lakaraslplist[lakarasitelist.index(lakara)]
+			vacya = vacyaslplist[vacyasitelist.index(vacya)]
+			vacana = vacanaslplist[vacanasitelist.index(vacana)]
+			purusa = purusaslplist[purusasitelist.index(purusa)]
+			data.append(gana + '.' + pada + '.' + lakara + '.' + vacya + '.' + purusa + '.' +vacana)
+		else:
+			case, vacana, gender = attr[0], attr[1], attr[2]
+			case = caseslplist[casesitelist.index(case)]
+			vacana = vacanaslplist[vacanasitelist.index(vacana)]
+			gender = genderslplist[gendersitelist.index(gender)]
+			data.append(gender + '.' + case + '.' + vacana)
+			
 	return data
 
 # function 'rv' for reverse verb identification.
 # It converts the devanagari verb form to SanskritMark for verbs
 # For verbs, the expected output format is verb.gana.pada.lakara.vacya.purusa.vacana
-# If there are more than one parsing possible, the expected output is in verb.{gana.pada.lakara.vacya.purusa.vacana|gana2.pada2.lakara2.vacya2.purusa2.vacana2} etc format.
+# If there are more than one parsing possible, the expected output is separated by '|'
 def rv(text):
 	text = text.decode('utf-8')
 	text = transcoder.transcoder_processString(text,'deva','slp1')
@@ -266,11 +280,47 @@ def rv(text):
 	verb = verbsoup.a.text
 	verb = re.sub("[0-9_]+", "", verb)
 	data = tosm(attributes)
-	if len(data) > 1:	
-		appendix = '{' + '|'.join(data) + '}'
+	m = []
+	if len(data) > 1:
+		for datum in data:
+			m.append(verb + '.' + datum)
+		output = '|'.join(m)
 	else:
-		appendix = data[0]
-	print verb + '.' +appendix
+		output = data[0]
+	return output
 
+# function 'rs' for reverse subanta identification.
+# It converts the devanagari verb form to SanskritMark for verbs
+# For verbs, the expected output format is noun.gender.case.vacana
+# If there are more than one parsing possible, the expected output is separated by '|'
+def rs(text):
+	text = text.decode('utf-8')
+	text = transcoder.transcoder_processString(text,'deva','slp1')
+	url = 'http://sanskrit.inria.fr/cgi-bin/SKT/sktlemmatizer?lex=MW&q=' + text + '&t=SL&c=Noun'
+	response = urllib2.urlopen(url)
+	#print "webpage downloaded at ",
+	#timestamp()
+	html_doc = response.read()
+	soup = BeautifulSoup(html_doc, 'html.parser')
+	#print "soup made at ",
+	#timestamp()
+	interestingdiv = soup.find("div", { "class" : "center" })
+	table = interestingdiv.find("table", { "class" : "yellow_cent" })
+	span = table.tr.th.find("span", { "class" : "latin12" })
+	data = str(span).split('<br>\n')[1]
+	verbattr_separator = str(data).split('[')
+	attributes = verbattr_separator[0]
+	verbsoup = BeautifulSoup(verbattr_separator[1], 'html.parser')
+	verb = verbsoup.a.i.text
+	verb = re.sub("[0-9_]+", "", verb)
+	data = tosm(attributes)
+	m = []
+	if len(data) > 1:
+		for datum in data:
+			m.append(verb + '.' + datum)
+		output = '|'.join(m)
+	else:
+		output = data[0]
+	return output
 	
-rv("जगाम")
+print rs("धवलेन")

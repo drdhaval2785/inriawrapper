@@ -49,3 +49,11 @@ where
 'vacana' takes '1'/'2'/'3' for ekavacana, dvivacana and bahuvacana respectively.
 
 e.g. `BU.1.p.low.t.1.1` signifies that the verb 'BU' has to be declined with 1st gana, parasmaipada, low lakara, kartari vacya, prathama purusa, ekavacana e.g. aBUt
+
+# SanskritMark to Devanagari
+
+If a SanskritMark description gives more than one form, they will be shown separated by '|'. Note that there would be no space around the separator.
+
+# Devanagari to SanskritMark
+
+If a given Sanskrit word can stand for more than one SanskritMark description, they will be shown separated by '|'. Note that there would be no space around the separator.
