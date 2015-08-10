@@ -7,6 +7,35 @@ import datetime
 import time
 import re
 import transcoder
+import HTMLParser
+import htmlentitydefs
+
+## http://effbot.org/zone/re-sub.htm#unescape-html
+# Removes HTML or XML character references and entities from a text string.
+#
+# @param text The HTML (or XML) source text.
+# @return The plain text, as a Unicode string, if necessary.
+
+def unescape(text):
+    def fixup(m):
+        text = m.group(0)
+        if text[:2] == "&#":
+            # character reference
+            try:
+                if text[:3] == "&#x":
+                    return unichr(int(text[3:-1], 16))
+                else:
+                    return unichr(int(text[2:-1]))
+            except ValueError:
+                pass
+        else:
+            # named entity
+            try:
+                text = unichr(htmlentitydefs.name2codepoint[text[1:-1]])
+            except KeyError:
+                pass
+        return text # leave as is
+    return re.sub("&#?\w+;", fixup, text)
 
 def timestamp():
 	print datetime.datetime.now()
@@ -255,7 +284,7 @@ def tosm(attributes):
 	return data
 
 def wordtypedecider(text):
-	text = text.decode('utf-8')
+	#text = text.decode('utf-8')
 	text = transcoder.transcoder_processString(text,'deva','slp1')
 	wordtype = ['Verb', 'Noun', 'Pron', 'Part', 'Advb', 'Abso', 'Voca', 'Iic', 'Ifc', 'Iiv', 'Piic']
 	errormessage = 'not found as a'
@@ -275,26 +304,29 @@ def wordtypedecider(text):
 # If there are more than one parsing possible, the expected output is separated by '|'
 # wordtype stands for Verb, Noun, Pron, Part, Advb, Abso, Voca, Iic, Ifc, Iiv, Piic
 def rv(text):
+	#text1 = transcoder.transcoder_processString(text.decode('utf-8'),'deva','slp1')
 	wordtype = wordtypedecider(text)
-	text = text.decode('utf-8')
 	text = transcoder.transcoder_processString(text,'deva','slp1')
+	text = text.strip('.')
 	url = 'http://sanskrit.inria.fr/cgi-bin/SKT/sktlemmatizer?lex=MW&q=' + text + '&t=SL&c=' + wordtype
 	response = urllib2.urlopen(url)
 	#print "webpage downloaded at ",
 	#timestamp()
 	html_doc = response.read()
+	html_doc = unescape(html_doc)
 	soup = BeautifulSoup(html_doc, 'html.parser')
 	#print "soup made at ",
 	#timestamp()
 	interestingdiv = soup.find("div", { "class" : "center" })
 	table = interestingdiv.find("table", { "class" : "yellow_cent" })
 	span = table.tr.th.find("span", { "class" : "latin12" })
-	data = str(span).split('<br>\n')[1]
-	verbattr_separator = str(data).split('}[')
+	data = unicode(span).split('<br>\n')[1]
+	verbattr_separator = unicode(data).split('}[')
 	attributes = verbattr_separator[0]
 	verbsoup = BeautifulSoup(verbattr_separator[1], 'html.parser')
 	verb = verbsoup.a.text
 	verb = re.sub("[0-9_]+", "", verb)
+	#verb = transcoder.transcoder_processString(verb,'roman','slp1')
 	data = tosm(attributes)
 	m = []
 	if len(data) > 1:
@@ -305,4 +337,26 @@ def rv(text):
 		output = verb + '.' + data[0]
 	return output
 
-print rv("अस्ति")
+# function revparser to parse document written in SanskritMark and render output.
+# The input should be stored in a file. words must be separated by space.
+def revparser(inputfile,outputfile):
+	f = codecs.open(inputfile, 'r', 'utf-8-sig')
+	content = f.readlines()
+	out = []
+	g = codecs.open(outputfile, 'w', 'utf-8-sig')
+	for line in content:
+		line = line.strip()
+		words = re.split('([ ,?"!]+)', line)
+		for x in xrange(len(words)):
+			if x%2 == 0 and words[x].endswith('.'):
+				g.write(rv(words[x]) + ".")
+			elif x%2 == 0 and not words[x].endswith('.'):
+				g.write(rv(words[x]))
+			else:
+				g.write(words[x])
+		g.write("\n")
+	g.close()
+
+#print rv("भविष्यथः")
+revparser('output.txt', 'trialrev.txt')
+#print transcoder.transcoder_processString(u'भविष्यथः','deva','slp1')
