@@ -223,9 +223,8 @@ def tosm(attributes):
 	genderslplist = ['m', 'f', 'n', 'a']
 	gendersitelist = ['m.', 'f.', 'n.', '*']
 	attributes = attributes.replace('{ ', '')
-	attributes = attributes.replace(' }', '')
+	attributes = attributes.strip()
 	possibles = attributes.split(' | ')
-	print possibles
 	data = []
 	for member in possibles:
 		if '[' in member:
@@ -255,14 +254,31 @@ def tosm(attributes):
 			
 	return data
 
+def wordtypedecider(text):
+	text = text.decode('utf-8')
+	text = transcoder.transcoder_processString(text,'deva','slp1')
+	wordtype = ['Verb', 'Noun', 'Pron', 'Part', 'Advb', 'Abso', 'Voca', 'Iic', 'Ifc', 'Iiv', 'Piic']
+	errormessage = 'not found as a'
+	for wordt in wordtype:
+		url = 'http://sanskrit.inria.fr/cgi-bin/SKT/sktlemmatizer?lex=MW&q=' + text + '&t=SL&c=' + wordt
+		response = urllib2.urlopen(url).read()
+		if errormessage in response:
+			pass
+		else:
+			return wordt
+
+		
+
 # function 'rv' for reverse verb identification.
 # It converts the devanagari verb form to SanskritMark for verbs
 # For verbs, the expected output format is verb.gana.pada.lakara.vacya.purusa.vacana
 # If there are more than one parsing possible, the expected output is separated by '|'
+# wordtype stands for Verb, Noun, Pron, Part, Advb, Abso, Voca, Iic, Ifc, Iiv, Piic
 def rv(text):
+	wordtype = wordtypedecider(text)
 	text = text.decode('utf-8')
 	text = transcoder.transcoder_processString(text,'deva','slp1')
-	url = 'http://sanskrit.inria.fr/cgi-bin/SKT/sktlemmatizer?lex=MW&q=' + text + '&t=SL&c=Verb'
+	url = 'http://sanskrit.inria.fr/cgi-bin/SKT/sktlemmatizer?lex=MW&q=' + text + '&t=SL&c=' + wordtype
 	response = urllib2.urlopen(url)
 	#print "webpage downloaded at ",
 	#timestamp()
@@ -274,7 +290,7 @@ def rv(text):
 	table = interestingdiv.find("table", { "class" : "yellow_cent" })
 	span = table.tr.th.find("span", { "class" : "latin12" })
 	data = str(span).split('<br>\n')[1]
-	verbattr_separator = str(data).split('[')
+	verbattr_separator = str(data).split('}[')
 	attributes = verbattr_separator[0]
 	verbsoup = BeautifulSoup(verbattr_separator[1], 'html.parser')
 	verb = verbsoup.a.text
@@ -286,41 +302,7 @@ def rv(text):
 			m.append(verb + '.' + datum)
 		output = '|'.join(m)
 	else:
-		output = data[0]
+		output = verb + '.' + data[0]
 	return output
 
-# function 'rs' for reverse subanta identification.
-# It converts the devanagari verb form to SanskritMark for verbs
-# For verbs, the expected output format is noun.gender.case.vacana
-# If there are more than one parsing possible, the expected output is separated by '|'
-def rs(text):
-	text = text.decode('utf-8')
-	text = transcoder.transcoder_processString(text,'deva','slp1')
-	url = 'http://sanskrit.inria.fr/cgi-bin/SKT/sktlemmatizer?lex=MW&q=' + text + '&t=SL&c=Noun'
-	response = urllib2.urlopen(url)
-	#print "webpage downloaded at ",
-	#timestamp()
-	html_doc = response.read()
-	soup = BeautifulSoup(html_doc, 'html.parser')
-	#print "soup made at ",
-	#timestamp()
-	interestingdiv = soup.find("div", { "class" : "center" })
-	table = interestingdiv.find("table", { "class" : "yellow_cent" })
-	span = table.tr.th.find("span", { "class" : "latin12" })
-	data = str(span).split('<br>\n')[1]
-	verbattr_separator = str(data).split('[')
-	attributes = verbattr_separator[0]
-	verbsoup = BeautifulSoup(verbattr_separator[1], 'html.parser')
-	verb = verbsoup.a.i.text
-	verb = re.sub("[0-9_]+", "", verb)
-	data = tosm(attributes)
-	m = []
-	if len(data) > 1:
-		for datum in data:
-			m.append(verb + '.' + datum)
-		output = '|'.join(m)
-	else:
-		output = data[0]
-	return output
-	
-print rs("धवलेन")
+print rv("अस्ति")
