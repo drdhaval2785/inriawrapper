@@ -50,6 +50,22 @@ where
 
 e.g. `BU.1.p.low.t.1.1` signifies that the verb 'BU' has to be declined with 1st gana, parasmaipada, low lakara, kartari vacya, prathama purusa, ekavacana e.g. aBUt
 
+# kRdanta form generator
+
+## Suggested format
+
+```
+verb.gana.kridanta.gender
+```
+
+where
+
+'gana' takes '1' to '10' where they are usual gaNas in pANini's grammar. Use '0' for secondary verbs.
+
+'kridanta' takes '1' for 'kta', '2' for 'ktava', '3' for 'Satf', '4' for 'SAnac', '5' for 'luwAdeSa parasmaipada', '6' for 'luwAdeSa Atmanepada', '7' for 'tavya', '8' for 'yat', '9' for 'anIyar', '10' for 'Ryat', '11' for 'liqAtmane' and '12' for 'liqparasmai'.
+
+'gender' takes 'm' for musculine, 'f' for feminine and 'n' for neuter.
+
 # SanskritMark to Devanagari
 
 If a SanskritMark description gives more than one form, they will be shown separated by '|'. Note that there would be no space around the separator.

@@ -151,6 +151,47 @@ def v(text):
 	numlist = [5,6,7,9,10,11,13,14,15]
 	return tin[numlist[tinlist.index(tinnumber)]]
 
+# function 'k' for kRdanta.
+"""
+verb.gana.kridanta.gender is the suggested format.
+where
+'gana' takes '1' to '10' where they are usual gaNas in pANini's grammar. Use '0' for secondary verbs.
+'kridanta' takes '1' for 'kta', '2' for 'ktava', '3' for 'Satf', '4' for 'SAnac', '5' for 'luwAdeSa parasmaipada', '6' for 'luwAdeSa Atmanepada', '7' for 'tavya', '8' for 'yat', '9' for 'anIyar', '10' for 'Ryat', '11' for 'liqAtmane' and '12' for 'liqparasmai'.
+'gender' takes 'm' for musculine, 'f' for feminine and 'n' for neuter.
+"""
+def k(text):
+	input = text.split('.')
+	verb = input[0]
+	gana = input[1]
+	kridanta = input[2]
+	gender = input[3]
+	kridantalist = ['क्त', 'क्तवत्', 'शतृ', 'शानच् कर्मणि', 'लुटादेश पर', 'लुटादेश आत्म', 'तव्य', 'यत्', 'अनीयर्', 'यत्', 'लिडादेश पर', 'लिडादेश आत्म', ]
+	kridantashort = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+	searchedkridanta = kridantalist[kridantashort.index(kridanta)]
+	searchedkridanta = searchedkridanta.decode('utf-8')
+	url = "http://sanskrit.inria.fr/cgi-bin/SKT/sktconjug?lex=MW&q=" + verb +"&t=SL&c=" + gana + "&font=deva"
+	response = urllib2.urlopen(url)
+	#print "webpage downloaded at ",
+	#timestamp()
+	html_doc = response.read()
+	soup = BeautifulSoup(html_doc, 'html.parser')
+	#print "soup made at ",
+	#timestamp()
+	interestingdiv = soup.findAll("div", { "class" : "center" })[1]
+	table = interestingdiv.find("table", { "class" : "mauve_cent" })
+	h3 = table.tr.th.findAll("h3", { "class" : "b3" })
+	for hhh in h3:
+		xxx = unicode(hhh)
+		if u" " + searchedkridanta in xxx:
+			words = hhh.findAll("span", { "class" : "devared"})
+			if gender == "f":
+				return unicode(words[1].string)
+			else:
+				return unicode(words[0].string)
+			
+
+print k('gam.1.6.f')
+
 # function 'd' for declention. It decides the proper declention function to chose i.e. 's' or 'v'
 def d(text):
 	input = text.split('.')
@@ -305,7 +346,7 @@ def r(text):
 		output = verb + '.' + data[0]
 	return output
 
-# function dsc (Devanagari -> SanskritMark converter) to convert document written in SanskritMark and render output.
+# function dsc (Devanagari -> SanskritMark converter) to convert document written in Devanagari to SanskritMark and render output.
 # The input should be stored in a file. words must be separated by space.
 def dsc(inputfile,outputfile):
 	f = codecs.open(inputfile, 'r', 'utf-8-sig')
