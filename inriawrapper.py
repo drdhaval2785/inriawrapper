@@ -7,35 +7,6 @@ import datetime
 import time
 import re
 import transcoder
-import HTMLParser
-import htmlentitydefs
-
-## http://effbot.org/zone/re-sub.htm#unescape-html
-# Removes HTML or XML character references and entities from a text string.
-#
-# @param text The HTML (or XML) source text.
-# @return The plain text, as a Unicode string, if necessary.
-
-def unescape(text):
-    def fixup(m):
-        text = m.group(0)
-        if text[:2] == "&#":
-            # character reference
-            try:
-                if text[:3] == "&#x":
-                    return unichr(int(text[3:-1], 16))
-                else:
-                    return unichr(int(text[2:-1]))
-            except ValueError:
-                pass
-        else:
-            # named entity
-            try:
-                text = unichr(htmlentitydefs.name2codepoint[text[1:-1]])
-            except KeyError:
-                pass
-        return text # leave as is
-    return re.sub("&#?\w+;", fixup, text)
 
 def timestamp():
 	print datetime.datetime.now()
@@ -45,7 +16,7 @@ def timestamp():
 
 
 # function 's' for generating 'subanta'
-""" The input format should be word.gender.case.vacana format. 
+""" The input format should be noun.gender.case.vacana format. 
 'gender' takes 'm'/'f'/'n'/'a' for musculine, feminine, neuter and any gender
 'case' takes '1'/'2'/'3'/'4'/'5'/'6'/'7'/'0' for nominative/accusative/instrumental/dative/ablative/genitive/locative and sambodhana respectively.
 'vacana' takes '1'/'2'/'3' for ekavacana, dvivacana and bahuvacana respectively
@@ -81,10 +52,6 @@ def s(text):
 			vibh.append(cell.text)
 	
 	return vibh[numlist[vibhaktilist.index(vibhaktinumber)]]
-	
-#print s('asmad.a.3.2')
-#print "subanta form culled out at ",
-#timestamp()
 
 # function selecttable to select appropriate table for verb data scrapping.
 # text in verb.gana.pada.lakara.vacya.purusa.vacana format.
@@ -195,9 +162,9 @@ def d(text):
 		print "Error in format of word entered."
 		return "????"
 
-# function dictconverter to parse document written in SanskritMark and render output.
+# function dc (dictionary converter) to parse document written in SanskritMark and render output.
 # This function converts a file of SanskritMark words into Devanagari output file. The input file must have only one word in each line.
-def dictconverter(inputfile,outputfile):
+def dc(inputfile,outputfile):
 	with open(inputfile) as f:
 		content = f.readlines()
 	out = []
@@ -209,17 +176,17 @@ def dictconverter(inputfile,outputfile):
 			temp.write(member.strip() + "\n")
 		temp.close()
 
-# function parser to parse document written in SanskritMark and render output.
+# function sdc(Sanskritmark-> Devanagari converter) to convert document written in SanskritMark to Devanagari output.
 # The input should be stored in a file. words must be separated by space.
-def parser(inputfile,outputfile):
+def sdc(inputfile,outputfile):
 	with open(inputfile) as f:
 		content = f.readlines()
 	out = []
 	g = codecs.open(outputfile, 'w', 'utf-8-sig')
 	for line in content:
+		print "Processing line -" + line
 		line = line.strip()
 		words = re.split('([ ,?"!]+)', line)
-		print words
 		for x in xrange(len(words)):
 			if x%2 == 0 and words[x].endswith('.'):
 				g.write(d(words[x]) + ".")
@@ -283,7 +250,8 @@ def tosm(attributes):
 			
 	return data
 
-def wordtypedecider(text):
+# wtd (word type decider) decides the type of input word e.g. Noun, Verb etc.
+def wtd(text):
 	#text = text.decode('utf-8')
 	text = transcoder.transcoder_processString(text,'deva','slp1')
 	wordtype = ['Verb', 'Noun', 'Pron', 'Part', 'Advb', 'Abso', 'Voca', 'Iic', 'Ifc', 'Iiv', 'Piic']
@@ -298,14 +266,15 @@ def wordtypedecider(text):
 
 		
 
-# function 'rv' for reverse verb identification.
-# It converts the devanagari verb form to SanskritMark for verbs
+# function 'r' for reverse conversion from Devanagari to SanskritMark.
+# It converts a Devanagari word to SanskritMark.
 # For verbs, the expected output format is verb.gana.pada.lakara.vacya.purusa.vacana
+# For nouns, the expected output format is noun.gender.case.vacana
 # If there are more than one parsing possible, the expected output is separated by '|'
 # wordtype stands for Verb, Noun, Pron, Part, Advb, Abso, Voca, Iic, Ifc, Iiv, Piic
-def rv(text):
+def r(text):
 	#text1 = transcoder.transcoder_processString(text.decode('utf-8'),'deva','slp1')
-	wordtype = wordtypedecider(text)
+	wordtype = wtd(text)
 	text = transcoder.transcoder_processString(text,'deva','slp1')
 	text = text.strip('.')
 	url = 'http://sanskrit.inria.fr/cgi-bin/SKT/sktlemmatizer?lex=MW&q=' + text + '&t=SL&c=' + wordtype
@@ -313,7 +282,6 @@ def rv(text):
 	#print "webpage downloaded at ",
 	#timestamp()
 	html_doc = response.read()
-	html_doc = unescape(html_doc)
 	soup = BeautifulSoup(html_doc, 'html.parser')
 	#print "soup made at ",
 	#timestamp()
@@ -337,26 +305,23 @@ def rv(text):
 		output = verb + '.' + data[0]
 	return output
 
-# function revparser to parse document written in SanskritMark and render output.
+# function dsc (Devanagari -> SanskritMark converter) to convert document written in SanskritMark and render output.
 # The input should be stored in a file. words must be separated by space.
-def revparser(inputfile,outputfile):
+def dsc(inputfile,outputfile):
 	f = codecs.open(inputfile, 'r', 'utf-8-sig')
 	content = f.readlines()
 	out = []
 	g = codecs.open(outputfile, 'w', 'utf-8-sig')
 	for line in content:
+		print "Processing line -" + line
 		line = line.strip()
 		words = re.split('([ ,?"!]+)', line)
 		for x in xrange(len(words)):
 			if x%2 == 0 and words[x].endswith('.'):
-				g.write(rv(words[x]) + ".")
+				g.write(r(words[x]) + ".")
 			elif x%2 == 0 and not words[x].endswith('.'):
-				g.write(rv(words[x]))
+				g.write(r(words[x]))
 			else:
 				g.write(words[x])
 		g.write("\n")
 	g.close()
-
-#print rv("भविष्यथः")
-revparser('output.txt', 'trialrev.txt')
-#print transcoder.transcoder_processString(u'भविष्यथः','deva','slp1')

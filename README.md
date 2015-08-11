@@ -10,6 +10,8 @@ A python library to make maximum use of Sanskrit related tools available at http
 
 3. Libraries used - codecs, urllib2, datetime, time, re
 
+4. [Transcoder](https://github.com/funderburkjim/sanskrit-transcoding) module by Jim Funderburk.
+
 # Todo
 
 The library is still under development.
