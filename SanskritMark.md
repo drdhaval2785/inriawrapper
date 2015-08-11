@@ -55,16 +55,21 @@ e.g. `BU.1.p.low.t.1.1` signifies that the verb 'BU' has to be declined with 1st
 ## Suggested format
 
 ```
-verb.gana.kridanta.gender
+verb.gana.kridanta.gender.case.vacana
 ```
 
 where
 
 'gana' takes '1' to '10' where they are usual gaNas in pANini's grammar. Use '0' for secondary verbs.
 
-'kridanta' takes '1' for 'kta', '2' for 'ktava', '3' for 'Satf', '4' for 'SAnac', '5' for 'luwAdeSa parasmaipada', '6' for 'luwAdeSa Atmanepada', '7' for 'tavya', '8' for 'yat', '9' for 'anIyar', '10' for 'Ryat', '11' for 'liqAtmane' and '12' for 'liqparasmai'.
+'kridanta' takes '1' for 'kta', '2' for 'ktava', '3' for 'Satf', '4' for 'SAnac', '5' for 'SAnac Atmanepada', '6' for 'luwAdeSa parasmaipada', '7' for 'luwAdeSa Atmanepada', '8' for 'tavya', '9' for 'yat', '10' for 'anIyar', '11' for 'Ryat', '12' for 'liqAtmane' and '13' for 'liqparasmai'.
 
 'gender' takes 'm' for musculine, 'f' for feminine and 'n' for neuter.
+
+'case' takes '1' for nominative, '2' for accusative, '3' for instrumental, '4' for dative, '5' for ablative, '6' for genitive, '7' for locative and '0' for sambodhana.
+
+'vacana' takes '1' for ekavacana, '2' for dvivacana and '3' for bahuvacana respectively.
+
 
 # SanskritMark to Devanagari
 

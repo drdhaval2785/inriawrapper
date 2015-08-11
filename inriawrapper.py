@@ -153,11 +153,13 @@ def v(text):
 
 # function 'k' for kRdanta.
 """
-verb.gana.kridanta.gender is the suggested format.
+verb.gana.kridanta.gender.case.vacana is the suggested format.
 where
 'gana' takes '1' to '10' where they are usual gaNas in pANini's grammar. Use '0' for secondary verbs.
-'kridanta' takes '1' for 'kta', '2' for 'ktava', '3' for 'Satf', '4' for 'SAnac', '5' for 'luwAdeSa parasmaipada', '6' for 'luwAdeSa Atmanepada', '7' for 'tavya', '8' for 'yat', '9' for 'anIyar', '10' for 'Ryat', '11' for 'liqAtmane' and '12' for 'liqparasmai'.
+'kridanta' takes '1' for 'kta', '2' for 'ktava', '3' for 'Satf', '4' for 'SAnac', '5' for 'SAnac Atmanepada', '6' for 'luwAdeSa parasmaipada', '7' for 'luwAdeSa Atmanepada', '8' for 'tavya', '9' for 'yat', '10' for 'anIyar', '11' for 'Ryat', '12' for 'liqAtmane' and '13' for 'liqparasmai'.
 'gender' takes 'm' for musculine, 'f' for feminine and 'n' for neuter.
+'case' takes '1' for nominative, '2' for accusative, '3' for instrumental, '4' for dative, '5' for ablative, '6' for genitive, '7' for locative and '0' for sambodhana.
+'vacana' takes '1' for ekavacana, '2' for dvivacana and '3' for bahuvacana respectively.
 """
 def k(text):
 	input = text.split('.')
@@ -165,8 +167,8 @@ def k(text):
 	gana = input[1]
 	kridanta = input[2]
 	gender = input[3]
-	kridantalist = ['क्त', 'क्तवत्', 'शतृ', 'शानच् कर्मणि', 'लुटादेश पर', 'लुटादेश आत्म', 'तव्य', 'यत्', 'अनीयर्', 'यत्', 'लिडादेश पर', 'लिडादेश आत्म', ]
-	kridantashort = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
+	kridantalist = ['क्त', 'क्तवत्', 'शतृ', 'शानच्', 'शानच् कर्मणि', 'लुटादेश पर', 'लुटादेश आत्म', 'तव्य', 'यत्', 'अनीयर्', 'यत्', 'लिडादेश पर', 'लिडादेश आत्म', ]
+	kridantashort = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13']
 	searchedkridanta = kridantalist[kridantashort.index(kridanta)]
 	searchedkridanta = searchedkridanta.decode('utf-8')
 	url = "http://sanskrit.inria.fr/cgi-bin/SKT/sktconjug?lex=MW&q=" + verb +"&t=SL&c=" + gana + "&font=deva"
@@ -188,14 +190,14 @@ def k(text):
 				return unicode(words[1].string)
 			else:
 				return unicode(words[0].string)
-			
 
-print k('gam.1.6.f')
 
-# function 'd' for declention. It decides the proper declention function to chose i.e. 's' or 'v'
+# function 'd' for declention. It decides the proper declention function to chose i.e. 's', 'v' or 'k'
 def d(text):
 	input = text.split('.')
-	if input[1] in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']:
+	if input[3] in ['m', 'f', 'n']:
+		return k(text).strip()
+	elif input[1] in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']:
 		return v(text).strip()
 	elif input[1] in ['m', 'f', 'n', 'a']:
 		return s(text).strip()
@@ -305,12 +307,64 @@ def wtd(text):
 		else:
 			return wordt
 
-		
+# kridtype
+def kridtype(krid):
+	kridantaslplist = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13']
+	kridantasitelist = ['pp.', 'ppa.', 'ppr. [1] ac.', 'ppr. [1] md.', 'ppr. ps.', 'pfu. ac.', 'pfu. md.', 'pfp. [3]', 'pfp. [1]', 'pfp. [2]', 'pending', 'ppf. ac.', 'ppf. md.']
+	attributes = krid.strip()
+	possibles = attributes.split(' | ')
+	data = []
+	for member in possibles:
+		kridanta = kridantaslplist[kridantasitelist.index(attributes)]
+		data.append(kridanta)	
+	return data
+	
+# kridantaattributes
+# verb.gana.kridanta.gender.case.vacana is the expected output.
+# 'kridanta' takes '1' for 'kta', '2' for 'ktavat', '3' for 'Satf', '4' for 'SAnac', '5' for 'SAnac Atmanepada', '6' for 'luwAdeSa parasmaipada', '7' for 'luwAdeSa Atmanepada', '8' for 'tavya', '9' for 'yat', '10' for 'anIyar', '11' for 'Ryat', '12' for 'liqAtmane' and '13' for 'liqparasmai'.
+def kridantaattributes(data):
+	firstanalysis = re.split('\}\[([^<]+)\}\[', data)
+	kriddata = firstanalysis[1]
+	verbdata = firstanalysis[2]
+	verb = re.split('<i>([^<]+)<\/i>', verbdata)[1]
+	gana = ''
+	krid = re.split(' \{ ', kriddata)[1] # details for kridanta derivation
+	kridanta = kridtype(krid)
+	suffdata = firstanalysis[0]
+	attributes = suffdata.replace('{ ', '')
+	attributes = attributes.strip()
+	possibles = attributes.split(' | ')
+	data = []
+	vacanaslplist = ['1', '2', '3']
+	vacanasitelist = ['sg', 'du', 'pl']
+	purusaslplist = ['p', 'm', 'u']
+	purusasitelist = ['3', '2', '1']
+	caseslplist = ['1', '2', '3', '4', '5', '6', '7', '0', ]
+	casesitelist = ['nom', 'acc', 'i', 'dat', 'abl', 'g', 'loc', 'sam', ] # sam absent in Gerard's site.
+	genderslplist = ['m', 'f', 'n', 'a']
+	gendersitelist = ['m.', 'f.', 'n.', '*']
+	for member in possibles:
+		attr = member.split('. ')
+		case, vacana, gender = attr[0], attr[1], attr[2]
+		case = caseslplist[casesitelist.index(case)]
+		vacana = vacanaslplist[vacanasitelist.index(vacana)]
+		gender = genderslplist[gendersitelist.index(gender)]
+		data.append(gender + '.' + case + '.' + vacana)
+	output = []
+	for mem1 in kridanta:
+		for mem2 in data:
+			output.append(verb + '.' + gana + '.' + mem1 + '.' + mem2)
+	if len(output) > 1:
+		display = '|'.join(output)
+	else:
+		display = output[0]
+	return display
 
 # function 'r' for reverse conversion from Devanagari to SanskritMark.
 # It converts a Devanagari word to SanskritMark.
 # For verbs, the expected output format is verb.gana.pada.lakara.vacya.purusa.vacana
 # For nouns, the expected output format is noun.gender.case.vacana
+# For kridantas, the expected outut format is verb.gana.kridanta.gender.case.vacana
 # If there are more than one parsing possible, the expected output is separated by '|'
 # wordtype stands for Verb, Noun, Pron, Part, Advb, Abso, Voca, Iic, Ifc, Iiv, Piic
 def r(text):
@@ -330,21 +384,26 @@ def r(text):
 	table = interestingdiv.find("table", { "class" : "yellow_cent" })
 	span = table.tr.th.find("span", { "class" : "latin12" })
 	data = unicode(span).split('<br>\n')[1]
-	verbattr_separator = unicode(data).split('}[')
-	attributes = verbattr_separator[0]
-	verbsoup = BeautifulSoup(verbattr_separator[1], 'html.parser')
-	verb = verbsoup.a.text
-	verb = re.sub("[0-9_]+", "", verb)
-	#verb = transcoder.transcoder_processString(verb,'roman','slp1')
-	data = tosm(attributes)
-	m = []
-	if len(data) > 1:
-		for datum in data:
-			m.append(verb + '.' + datum)
-		output = '|'.join(m)
-	else:
-		output = verb + '.' + data[0]
+	if wordtype not in ["Part", "Piic" ]:		
+		verbattr_separator = unicode(data).split('}[')
+		attributes = verbattr_separator[0]
+		verbsoup = BeautifulSoup(verbattr_separator[1], 'html.parser')
+		verb = verbsoup.a.text
+		verb = re.sub("[0-9_]+", "", verb)
+		#verb = transcoder.transcoder_processString(verb,'roman','slp1')
+		data = tosm(attributes)
+		m = []
+		if len(data) > 1:
+			for datum in data:
+				m.append(verb + '.' + datum)
+			output = '|'.join(m)
+		else:
+			output = verb + '.' + data[0]
+	elif wordtype in ["Part", "Piic" ]:
+		output = kridantaattributes(data)
 	return output
+
+print r(u'गच्छमानेन')
 
 # function dsc (Devanagari -> SanskritMark converter) to convert document written in Devanagari to SanskritMark and render output.
 # The input should be stored in a file. words must be separated by space.

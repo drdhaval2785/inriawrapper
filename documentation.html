@@ -51,7 +51,8 @@ It gives facilities to decline a word in Sanskrit from its root with given param
 	<ol>
 		<li><div class="highlight-python"><div class="highlight"><pre><span class="n">s(noun.gender.case.vacana)</span></pre></div></div> returns subanta form of 'noun' which has 'gender' gender, 'case' case and 'vacana' vacana. e.g. s('Davala.m.1.1') generates धवलः</li>
 		<li><div class="highlight-python"><div class="highlight"><pre><span class="n">v(verb.gana.pada.lakara.vacya.purusa.vacana)</span></pre></div></div> returns tiGanta form of 'verb' which belongs to 'gana' gana, has 'pada' pada, is in 'lakara' tense, has 'vacya' voice, 'purusa' person, and 'vacana' vacana. e.g. v('gam.1.p.law.t.1.1') generates गच्छति</li>
-		<li><div class="highlight-python"><div class="highlight"><pre><span class="n">d(text)</span></pre></div></div> returns subanta / tiGanta form from a given word, proivded the 'text' is in proper <a href="https://github.com/drdhaval2785/inriawrapper/blob/master/SanskritMark.md">SanskritMark</a> specifications. e.g. d('Davala.m.1.1') generates धवलः and v('gam.1.p.law.t.1.1') generates गच्छति. the user doesn't have to bother about selecting 's' or 'v' functions. The choice is made by machine in this usage.</li>
+		<li><div class="highlight-python"><div class="highlight"><pre><span class="n">k(verb.gana.kridanta.gender.case.vacana)</span></pre></div></div> returns kridanta form of 'verb' which belongs to 'gana' gana, is in 'kridanta' form, has 'gender' gender, 'case' case, and 'vacana' vacana. e.g. k('gam.1.4.m.3.1') generates गच्छमानेन</li>
+		<li><div class="highlight-python"><div class="highlight"><pre><span class="n">d(text)</span></pre></div></div> returns subanta / tiGanta / kridanta form from a given word, proivded the 'text' is in proper <a href="https://github.com/drdhaval2785/inriawrapper/blob/master/SanskritMark.md">SanskritMark</a> specifications. e.g. d('Davala.m.1.1') generates धवलः and v('gam.1.p.law.t.1.1') generates गच्छति. the user doesn't have to bother about selecting 's' or 'v' functions. The choice is made by machine in this usage.</li>
 		<li><div class="highlight-python"><div class="highlight"><pre><span class="n">dc(inputfile,outputfile)</span></pre></div></div> dc (dictionary converter) converts a file of SanskritMark words into Devanagari output file. The input file must have only one word in each line.</li>
 		<li><div class="highlight-python"><div class="highlight"><pre><span class="n">sdc(inputfile,outputfile)</span></pre></div></div> sdc (Sanskritmark-> Devanagari converter) function converts document written in SanskritMark to Devanagari output.</li>
 		<li><div class="highlight-python"><div class="highlight"><pre><span class="n">wtd(devanagariword)</span></pre></div></div> wtd (word type decider) returns the type of input word like Noun, Verb etc e.g. wtd(धवलः) returns 'Noun' wtd(गच्छति) returns 'Verb'.</li>
@@ -114,6 +115,16 @@ e.g. s('Davala.m.1.1')
 'purusa' takes 'p'/'m'/'u' for prathama, madhyama, uttama respectively.<br/>
 'vacana' takes '1'/'2'/'3' for ekavacana, dvivacana and bahuvacana respectively.<br/><br/>
 e.g. v('gam.1.p.law.t.1.1')
+</p>
+</div>
+<div class="section" id="k">
+<h2>k(verb.gana.kridanta.gender.case.vacana)<a class="headerlink" href="#k" title="Permalink to this headline">¶</a></h2>
+<p>'gana' takes '1' to '10' where they are usual gaNas in pANini's grammar. Use '0' for secondary verbs.<br/>
+'kridanta' takes '1' for 'kta', '2' for 'ktava', '3' for 'Satf', '4' for 'SAnac', '5' for 'SAnac Atmanepada', '6' for 'luwAdeSa parasmaipada', '7' for 'luwAdeSa Atmanepada', '8' for 'tavya', '9' for 'yat', '10' for 'anIyar', '11' for 'Ryat', '12' for 'liqAtmane' and '13' for 'liqparasmai'.<br/>
+'gender' takes 'm' for musculine, 'f' for feminine and 'n' for neuter.<br/>
+'case' takes '1' for nominative, '2' for accusative, '3' for instrumental, '4' for dative, '5' for ablative, '6' for genitive, '7' for locative and '0' for sambodhana.<br/>
+'vacana' takes '1' for ekavacana, '2' for dvivacana and '3' for bahuvacana respectively.<br/><br/>
+e.g. k('gam.1.4.m.1.1')
 </p>
 </div>
 <div class="section" id="d">
