@@ -2,6 +2,10 @@
 
 A python library to make maximum use of Sanskrit related tools available at http://sanskrit.inria.fr/
 
+# Usage
+
+See [Documentation](https://github.com/drdhaval2785/inriawrapper/blob/master/documentation.html) for usage of various functions.
+
 # Requirements
 
 1. [python2.7](https://www.python.org/)
