@@ -20,6 +20,7 @@ def timestamp():
 'gender' takes 'm'/'f'/'n'/'a' for musculine, feminine, neuter and any gender
 'case' takes '1'/'2'/'3'/'4'/'5'/'6'/'7'/'0' for nominative/accusative/instrumental/dative/ablative/genitive/locative and sambodhana respectively.
 'vacana' takes '1'/'2'/'3' for ekavacana, dvivacana and bahuvacana respectively
+This function also declines pronouns.
 """
 def s(text):
 	input = text.split('.')
@@ -191,10 +192,21 @@ def k(text):
 			else:
 				return unicode(words[0].string)
 
+# function adv for adverbs
+def adv(text):
+	input = text.split('.')
+	errormessage = 'not found as a'
+	if input[1] == 'adv':
+		url = 'http://sanskrit.inria.fr/cgi-bin/SKT/sktlemmatizer?lex=MW&q=' + input[0] + '&t=SL&c=Advb'
+		response = urllib2.urlopen(url).read()
+		if errormessage not in response:
+			return transcoder.transcoder_processString(input[0],'slp1','deva')
 
 # function 'd' for declention. It decides the proper declention function to chose i.e. 's', 'v' or 'k'
 def d(text):
 	input = text.split('.')
+	if input[1] == 'adv':
+		return adv(text).strip()
 	if input[3] in ['m', 'f', 'n']:
 		return k(text).strip()
 	elif input[1] in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10']:
@@ -321,7 +333,7 @@ def kridtype(krid):
 	
 # kridantaattributes
 # verb.gana.kridanta.gender.case.vacana is the expected output.
-# 'kridanta' takes '1' for 'kta', '2' for 'ktavat', '3' for 'Satf', '4' for 'SAnac', '5' for 'SAnac Atmanepada', '6' for 'luwAdeSa parasmaipada', '7' for 'luwAdeSa Atmanepada', '8' for 'tavya', '9' for 'yat', '10' for 'anIyar', '11' for 'Ryat', '12' for 'liqAtmane' and '13' for 'liqparasmai'.
+# 'kridanta' takes '1' for 'kta', '2' for 'ktavat', '3' for 'Satf', '4' for 'SAnac', '5' for 'SAnac Atmanepada', '6' for 'luwAdeSa parasmaipada', '7' for 'luwAdeSa Atmanepada', '8' for 'tavya', '9' for 'yat', '10' for 'anIyar', '11' for 'Ryat', '12' for 'liqparasmai' and '13' for 'liqAtmane'.
 def kridantaattributes(data):
 	firstanalysis = re.split('\}\[([^<]+)\}\[', data)
 	kriddata = firstanalysis[1]
@@ -403,7 +415,9 @@ def r(text):
 		output = kridantaattributes(data)
 	return output
 
-print r(u'गच्छमानेन')
+print d('Jawiti.adv')
+
+print r(u'अहम्')
 
 # function dsc (Devanagari -> SanskritMark converter) to convert document written in Devanagari to SanskritMark and render output.
 # The input should be stored in a file. words must be separated by space.

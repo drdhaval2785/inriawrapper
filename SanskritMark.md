@@ -8,7 +8,7 @@ The guideline is important to maintain uniformity.
 
 
 
-# Noun form generator
+# Noun form
 
 ## Suggested format
 
@@ -26,7 +26,7 @@ where
 
 e.g. `Davala.m.1.1` signifies that the noun 'Davala' has to be declined with musculine, nominative ekavacana i.e. DavalaH
 
-# Verb form generator
+# Verb form
 
 ## Suggested format
 
@@ -50,7 +50,7 @@ where
 
 e.g. `BU.1.p.low.t.1.1` signifies that the verb 'BU' has to be declined with 1st gana, parasmaipada, low lakara, kartari vacya, prathama purusa, ekavacana e.g. aBUt
 
-# kRdanta form generator
+# kRdanta form
 
 ## Suggested format
 
@@ -62,13 +62,27 @@ where
 
 'gana' takes '1' to '10' where they are usual gaNas in pANini's grammar. Use '0' for secondary verbs.
 
-'kridanta' takes '1' for 'kta', '2' for 'ktava', '3' for 'Satf', '4' for 'SAnac', '5' for 'SAnac Atmanepada', '6' for 'luwAdeSa parasmaipada', '7' for 'luwAdeSa Atmanepada', '8' for 'tavya', '9' for 'yat', '10' for 'anIyar', '11' for 'Ryat', '12' for 'liqAtmane' and '13' for 'liqparasmai'.
+'kridanta' takes '1' for 'kta', '2' for 'ktavat', '3' for 'Satf', '4' for 'SAnac', '5' for 'SAnac Atmanepada', '6' for 'luwAdeSa parasmaipada', '7' for 'luwAdeSa Atmanepada', '8' for 'tavya', '9' for 'yat', '10' for 'anIyar', '11' for 'Ryat', '12' for 'liqparasmai' and '13' for 'liqAtmane'.
 
 'gender' takes 'm' for musculine, 'f' for feminine and 'n' for neuter.
 
 'case' takes '1' for nominative, '2' for accusative, '3' for instrumental, '4' for dative, '5' for ablative, '6' for genitive, '7' for locative and '0' for sambodhana.
 
 'vacana' takes '1' for ekavacana, '2' for dvivacana and '3' for bahuvacana respectively.
+
+# adverbial form
+
+## Suggested format
+
+```
+adverb.adv
+```
+
+where
+
+'adverb' is the adverb concerned.
+
+'adv' is constant string.
 
 
 # SanskritMark to Devanagari
