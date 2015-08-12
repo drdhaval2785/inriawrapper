@@ -270,7 +270,7 @@ def tosm(attributes):
 	purusaslplist = ['p', 'm', 'u']
 	purusasitelist = ['3', '2', '1']
 	caseslplist = ['1', '2', '3', '4', '5', '6', '7', '0', ]
-	casesitelist = ['nom', 'acc', 'i', 'dat', 'abl', 'g', 'loc', 'sam', ] # sam absent in Gerard's site.
+	casesitelist = ['nom', 'acc', 'i', 'dat', 'abl', 'g', 'loc', 'voc', ]
 	genderslplist = ['m', 'f', 'n', 'a']
 	gendersitelist = ['m.', 'f.', 'n.', '*']
 	attributes = attributes.replace('{ ', '')
@@ -309,7 +309,7 @@ def tosm(attributes):
 def wtd(text):
 	#text = text.decode('utf-8')
 	text = transcoder.transcoder_processString(text,'deva','slp1')
-	wordtype = ['Verb', 'Noun', 'Pron', 'Part', 'Advb', 'Abso', 'Voca', 'Iic', 'Ifc', 'Iiv', 'Piic']
+	wordtype = ['Noun', 'Voca', 'Verb', 'Pron', 'Part', 'Advb', 'Abso', 'Iic', 'Ifc', 'Iiv', 'Piic']
 	errormessage = 'not found as a'
 	for wordt in wordtype:
 		url = 'http://sanskrit.inria.fr/cgi-bin/SKT/sktlemmatizer?lex=MW&q=' + text + '&t=SL&c=' + wordt
@@ -339,6 +339,7 @@ def kridantaattributes(data):
 	kriddata = firstanalysis[1]
 	verbdata = firstanalysis[2]
 	verb = re.split('<i>([^<]+)<\/i>', verbdata)[1]
+	verb = transcoder.transcoder_processString(verb, 'roman', 'slp1')
 	gana = ''
 	krid = re.split(' \{ ', kriddata)[1] # details for kridanta derivation
 	kridanta = kridtype(krid)
@@ -402,7 +403,7 @@ def r(text):
 		verbsoup = BeautifulSoup(verbattr_separator[1], 'html.parser')
 		verb = verbsoup.a.text
 		verb = re.sub("[0-9_]+", "", verb)
-		#verb = transcoder.transcoder_processString(verb,'roman','slp1')
+		verb = transcoder.transcoder_processString(verb,'roman','slp1')
 		data = tosm(attributes)
 		m = []
 		if len(data) > 1:
@@ -417,7 +418,7 @@ def r(text):
 
 print d('Jawiti.adv')
 
-print r(u'अहम्')
+print r(u'राम')
 
 # function dsc (Devanagari -> SanskritMark converter) to convert document written in Devanagari to SanskritMark and render output.
 # The input should be stored in a file. words must be separated by space.
